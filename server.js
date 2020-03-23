@@ -14,7 +14,7 @@ app.listen(3000, () => {
             throw error;
         }
         db = client.db(dbName);
-        console.log("Connected to `" + dbName + "`!");
+        console.log("Connected to `" + dbName + "`!" + "listening on 3000!");
     });
 });
 
@@ -39,11 +39,28 @@ app.post('/messages', (req, res) => {
   })
 })
 
+// thumbsUP
 app.put('/messages', (req, res) => {
   db.collection('messages')
   .findOneAndUpdate({name: req.body.name, msg: req.body.msg}, {
     $set: {
       thumbUp:req.body.thumbUp + 1
+    }
+  }, {
+    sort: {_id: -1},
+    upsert: true
+  }, (err, result) => {
+    if (err) return res.send(err)
+    res.send(result)
+  })
+})
+
+// thumbsDown
+app.put('/thumbDown', (req, res) => {
+  db.collection('messages')
+  .findOneAndUpdate({name: req.body.name, msg: req.body.msg}, {
+    $set: {
+      thumbUp:req.body.thumbUp - 1
     }
   }, {
     sort: {_id: -1},
